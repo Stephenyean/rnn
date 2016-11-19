@@ -1,7 +1,7 @@
 import theano.tensor as T
 from utils import sharedX
-
-
+import theano
+import numpy as np
 class SGDOptimizer(object):
     def __init__(self, learning_rate, weight_decay, momentum):
         self.lr = learning_rate
@@ -28,5 +28,12 @@ class RMSpropOptimizer(object):
         self.eps = eps
 
     def get_updates(self, cost, params):
-        # Your codes here
-
+	grads = T.grad(cost=cost, wrt=params)
+	updates = []
+	for p, g in zip(params, grads):
+	    value = p.get_value(borrow=True)
+	    accu = theano.shared(np.zeros(value.shape, dtype=value.dtype),broadcastable = p.broadcastable)
+	    accu_new = accu * self.rho + (1 - self.rho) * g ** 2
+	    updates.append((accu,accu_new))
+	    updates.append((p,p-(self.lr * g/T.sqrt(accu_new + self.eps))))
+	return updates

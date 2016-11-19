@@ -7,5 +7,5 @@ class CrossEntropyLoss(object):
 
     def forward(self, inputs, labels):
         # Your codes here
-        T.sum(T.nnet.categorical_crossentropy(inputs,labels))
+        return T.sum(T.nnet.categorical_crossentropy(inputs,labels))
 

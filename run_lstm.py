@@ -14,7 +14,7 @@ INPUT_DIM = 20
 OUTPUT_DIM = 10
 
 model = Network()
-model.add(RNN('rnn1', HIDDEN_DIM, INPUT_DIM, 0.1))      # output shape: 4 x HIDDEN_DIM
+model.add(LSTM('rnn1', HIDDEN_DIM, INPUT_DIM, 0.1))      # output shape: 4 x HIDDEN_DIM
 model.add(Linear('fc', HIDDEN_DIM, OUTPUT_DIM, 0.1))    # output shape: 4 x OUTPUT_DIM
 model.add(Softmax('softmax'))
 

@@ -20,8 +20,8 @@ model.add(Softmax('softmax'))
 
 loss = CrossEntropyLoss('xent')
 
-optim = SGDOptimizer(0.01, 0, 0)
-#optim = RMSpropOptimizer(0.01)
+#optim = SGDOptimizer(0.01, 0, 0)
+optim = RMSpropOptimizer(0.001)
 input_placeholder = T.fmatrix('input')
 label_placeholder = T.fmatrix('label')
 

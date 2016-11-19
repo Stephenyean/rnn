@@ -31,7 +31,7 @@ class Softmax(Layer):
 
     def forward(self, inputs):
         # Your codes here
-        return T.nnet.nnet.sigmoid(inputs)
+        return T.nnet.softmax(inputs)
 
 class Linear(Layer):
     def __init__(self, name, inputs_dim, num_output, init_std):
@@ -130,14 +130,18 @@ class LSTM(Layer):
             c_t_prev: cell states at previous timestamp
         """
         # Your codes here
-        i_t = T.nnet.nnet.sigmoid(T.dot(x_t, self.Wi) + T.dot(h_t_prev,self.Ui) + T.dot(c_t_prev, self.Vi) + self.b_i.dimshuffle('x',0))
-        f_t = T.nnet.nnet.sigmoid(T.dot(x_t, self.Wf) + T.dot(h_t_prev,self.Uf) + T.dot(c_t_prev, self.Vf) + self.b_f.dimshuffle('x',0))
-        o_t = T.nnet.nnet.sigmoid(T.dot(x_t, self.Wo) + T.dot(h_t_prev,self.Uo) + T.dot(c_t_prev, self.Vo) + self.b_o.dimshuffle('x',0))
-        _c_t = T.tanh(T.dot(x_t, self.Wc) + T.dot(h_t_prev, self.Uc), self.b_c.dimshuffle('x',0))
-        c_t = theano.scan(lambda x,y: T.dot(x,y), sequences=[f_t, c_t_prev]) + theano.scan(lambda x,y: T.dot(x,y), sequences=[i_t,_c_t])
-        h_t = theano.scan(lambda x,y: T.dot(x,y), sequences=[o_t, T.tanh(c_t)])
-        return [h_t, c_t]
+        i_t = T.nnet.nnet.sigmoid(T.dot(x_t, self.Wi) + T.dot(h_t_prev,self.Ui) + T.dot(c_t_prev, self.Vi) + self.b_i)
+        f_t = T.nnet.nnet.sigmoid(T.dot(x_t, self.Wf) + T.dot(h_t_prev,self.Uf) + T.dot(c_t_prev, self.Vf) + self.b_f)
+        o_t = T.nnet.nnet.sigmoid(T.dot(x_t, self.Wo) + T.dot(h_t_prev,self.Uo) + T.dot(c_t_prev, self.Vo) + self.b_o)
+        _c_t = T.tanh(T.dot(x_t, self.Wc) + T.dot(h_t_prev, self.Uc) +  self.b_c)
+        #c_t1,update1 = theano.scan(lambda x,y: T.dot(x,y), sequences=[f_t, c_t_prev])
+	#c_t2,update2 = theano.scan(lambda x,y: T.dot(x,y), sequences=[i_t,_c_t])
+        #c_t = c_t1 + c_t2
+	#h_t = theano.scan(lambda x,y: T.dot(x,y), sequences=[o_t, T.tanh(c_t)])
+        c_t = f_t * c_t_prev + i_t * _c_t
+	h_t = o_t * T.tanh(c_t)
+	return [h_t, h_t, c_t]
+    
     def params(self):
         return [self.Wi, self.Ui, self.Vi, self.b_i, self.Wf, self.Uf, self.Vf, self.b_f, self.Wo, self.Uo, self.Vo, self.b_o, self.Wc, self.Uc, self.b_c]
         # Your codes here
-
